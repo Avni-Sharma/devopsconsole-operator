@@ -46,6 +46,10 @@ function prepare() {
 
 function run_tests_without_coverage() {
   make docker-test-unit
+  TAG=$(echo $GIT_COMMIT | cut -c1-${DEVSHIFT_TAG_LEN})
+  export DEVOPSCONSOLE_REPO=${REGISTRY}/openshiftio/devopsconsole-operator-pr:$TAG
+  deploy "pr"
+  make docker-test-olm-integration
   echo "CICO: ran tests without coverage"
 }
 
@@ -74,6 +78,7 @@ function tag_push() {
 function deploy() {
   # Login first
   REGISTRY="quay.io"
+  target=$1
 
   if [[ -n "${QUAY_USERNAME}" && -n "${QUAY_PASSWORD}" ]]; then
     docker login -u ${QUAY_USERNAME} -p ${QUAY_PASSWORD} ${REGISTRY}
@@ -85,11 +90,12 @@ function deploy() {
   make docker-image-deploy
 
   TAG=$(echo $GIT_COMMIT | cut -c1-${DEVSHIFT_TAG_LEN})
-
-
-  if [[ "$TARGET" = "rhel" ]]; then
+ 
+  if [[ "$target" = "rhel" ]]; then
     tag_push ${REGISTRY}/openshiftio/rhel-devopsconsole-operator:$TAG
     tag_push ${REGISTRY}/openshiftio/rhel-devopsconsole-operator:latest
+  elif [[ "$target" = "pr" ]]; then
+    tag_push ${REGISTRY}/openshiftio/devopsconsole-operator-pr:$TAG
   else
     tag_push ${REGISTRY}/openshiftio/devopsconsole-operator:$TAG
     tag_push ${REGISTRY}/openshiftio/devopsconsole-operator:latest

@@ -127,6 +127,24 @@ e2e-cleanup:
 	oc login -u system:admin
 	oc delete project devconsole-e2e-test || true
 
+.PHONY: test-olm-integration
+## Runs the e2e tests without coverage
+test-olm-integration: build build-image e2e-setup
+	$(call log-info,"Running E2E test: $@")
+	#TODO: the below command should be replaced with the actual test command.
+	#go test ./test/olm/... -root=$(PWD) -kubeconfig=$(HOME)/.kube/config -globalMan deploy/test/global-manifests.yaml -namespacedMan deploy/test/namespace-manifests.yaml -v -parallel=1 -singleNamespace
+	echo ${DEVOPSCONSOLE_REPO}
+	echo "###################################"
+
+.PHONY: olm-integration-setup
+olm-integration-setup:  e2e-cleanup
+	oc new-project devconsole-e2e-test || true
+
+.PHONY: olm-integration-cleanup
+olm-integration-cleanup:
+	oc login -u system:admin
+	oc delete project devconsole-e2e-test || true
+
 #-------------------------------------------------------------------------------
 # Inspect coverage of unit tests, integration tests in either pure
 # console mode or in a browser (*-html).
