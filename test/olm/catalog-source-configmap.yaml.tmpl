@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: devopsconsole
+  namespace: olm
+data:
+  clusterServiceVersions: |2-
+    {{ csvs }}
+  customResourceDefinitions: |2-
+    {{ crds }}
+  packages: |2-
+    {{ packages }}
